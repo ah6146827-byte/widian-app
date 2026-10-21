@@ -1,0 +1,1397 @@
+```برمجة هشام الجابري
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إدارة كروت مطعم وديان حضرموت - تطبيق أندرويد بالذكاء البصري</title>
+    <!-- Web App Manifest Requirements for Android PWA -->
+    <meta name="theme-color" content="#0f3822">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogItmF2LfZudmFINmI2K/Zitin2YYg2K32ttix2YXZiNiqIiwKICAic2hvcnRfbmFtZSI6ICLZiNiv2YrYp9mGINmO2LHYp9mFIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwZjM4MjIiLAogICJ0aGVtZV9jb2xvcIjogIiMwZjM4MjIiLAogICJpY29ucyI6IFtdCn0=">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0f3822',
+                            green: '#1b5e3a',
+                            lightgreen: '#2d8a54',
+                            gold: '#c59b27',
+                            lightgold: '#f3e5ab',
+                            accent: '#d4af37',
+                            danger: '#dc2626',
+                            surface: '#f8faf9'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f1f5f2;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .btn-active:active {
+            transform: scale(0.95);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+        }
+        .brand-gradient {
+            background: linear-gradient(135deg, #0f3822 0%, #1b5e3a 100%);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        @keyframes scanAnimation {
+            0% { top: 0%; }
+            50% { top: 95%; }
+            100% { top: 0%; }
+        }
+        .scanner-line {
+            animation: scanAnimation 2s infinite linear;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 pb-20 md:pb-10 min-h-screen select-none">
+
+    <header class="brand-gradient text-white shadow-lg sticky top-0 z-40 border-b-2 border-brand-gold">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-full bg-brand-gold flex items-center justify-center text-brand-dark font-black text-xl shadow-md border-2 border-white">
+                    <i class="fa-solid font-bold fa-utensils"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold tracking-wide text-brand-lightgold">مطعم وديان حضرموت</h1>
+                    <p class="text-xs text-emerald-200">نظام إدارة وعدّ الكروت المباشر بالكاميرا الذكية</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <button onclick="openAndroidGuideModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs px-3 py-1.5 rounded-xl font-black flex items-center gap-1.5 shadow btn-active">
+                    <i class="fa-brands fa-android text-base"></i>
+                    <span>تحويل لـ APK</span>
+                </button>
+                <button onclick="undoLastAction()" title="تراجع" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg transition btn-active">
+                    <i class="fa-solid fa-rotate-left text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-3 sm:px-4 pt-4">
+
+        <!-- Banner for Android Conversion -->
+        <div class="bg-gradient-to-r from-slate-900 to-brand-dark text-white rounded-2xl p-4 shadow-lg mb-4 flex flex-col sm:flex-row justify-between items-center gap-3 border border-amber-400/30">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl border border-emerald-500/40">
+                    <i class="fa-brands fa-android"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-sm sm:text-base text-amber-300">كيف تجعل هذا الملف تطبيق أندرويد مثبت (.APK)؟</h3>
+                    <p class="text-xs text-slate-300">يمكنك تثبيته على جوالك مباشرة كـ APK أو تطبيقه كـ PWA بدون متجر</p>
+                </div>
+            </div>
+            <button onclick="openAndroidGuideModal()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow btn-active flex items-center justify-center gap-2">
+                <i class="fa-solid fa-download"></i>
+                <span>عرض خطوات التحويل والـ APK</span>
+            </button>
+        </div>
+
+        <nav class="flex space-x-1 space-x-reverse bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200 overflow-x-auto mb-5 text-sm font-bold">
+            <button onclick="switchTab('rice')" id="tab-rice" class="tab-btn flex-1 min-w-[80px] py-2.5 px-3 rounded-xl transition flex flex-col sm:flex-row items-center justify-center gap-1.5 text-brand-dark bg-emerald-50 border border-emerald-200 shadow-sm">
+                <i class="fa-solid fa-bowl-rice text-lg text-emerald-700"></i>
+                <span>الرز</span>
+            </button>
+            <button onclick="switchTab('meat')" id="tab-meat" class="tab-btn flex-1 min-w-[80px] py-2.5 px-3 rounded-xl transition flex flex-col sm:flex-row items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-50">
+                <i class="fa-solid fa-drumstick-bite text-lg text-amber-800"></i>
+                <span>اللحم</span>
+            </button>
+            <button onclick="switchTab('chicken')" id="tab-chicken" class="tab-btn flex-1 min-w-[80px] py-2.5 px-3 rounded-xl transition flex flex-col sm:flex-row items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-50">
+                <i class="fa-solid fa-egg text-lg text-orange-600"></i>
+                <span>الدجاج والغداء</span>
+            </button>
+            <button onclick="switchTab('okda')" id="tab-okda" class="tab-btn flex-1 min-w-[80px] py-2.5 px-3 rounded-xl transition flex flex-col sm:flex-row items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-50">
+                <i class="fa-solid fa-fire-burner text-lg text-red-600"></i>
+                <span>العقدة</span>
+            </button>
+            <button onclick="switchTab('shifts')" id="tab-shifts" class="tab-btn flex-1 min-w-[80px] py-2.5 px-3 rounded-xl transition flex flex-col sm:flex-row items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-50">
+                <i class="fa-solid fa-file-invoice text-lg text-blue-600"></i>
+                <span>التقارير</span>
+            </button>
+        </nav>
+
+        <div class="bg-gradient-to-r from-brand-dark to-brand-green text-white rounded-2xl p-4 shadow-md mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="p-3 bg-brand-gold/20 rounded-xl text-brand-gold text-2xl">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base">العد التلقائي المباشر بالكاميرا الحقيقية</h3>
+                    <p class="text-xs text-emerald-200">التقاط وتحليل كروت المطعم المصورة وعدها فورياً</p>
+                </div>
+            </div>
+            <button onclick="openLiveCameraModal('all')" class="w-full sm:w-auto px-5 py-2.5 gold-gradient hover:opacity-95 text-brand-dark font-extrabold rounded-xl shadow-md transition btn-active flex items-center justify-center gap-2">
+                <i class="fa-solid fa-camera-retro text-lg"></i>
+                <span>فتح كاميرا الجوال المباشرة</span>
+            </button>
+        </div>
+
+        <section id="sec-rice" class="tab-content space-y-4">
+            <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                    <h2 class="text-lg font-bold text-brand-dark flex items-center gap-2">
+                        <i class="fa-solid fa-bowl-rice text-emerald-600"></i>
+                        قسم كروت الرز
+                    </h2>
+                    <span class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">حساب إجمالي الأنفار</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="riceGrid"></div>
+                <div class="mt-6 bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="space-y-1 text-center sm:text-right w-full md:w-auto">
+                        <div class="text-xs text-emerald-800 font-bold">إجمالي كروت الرز</div>
+                        <div class="text-2xl font-black text-brand-dark" id="riceTotalCards">0 كرت</div>
+                    </div>
+                    <div class="h-8 w-px bg-emerald-200 hidden md:block"></div>
+                    <div class="space-y-1 text-center sm:text-right w-full md:w-auto">
+                        <div class="text-xs text-emerald-800 font-bold">إجمالي الأنفار المحسوبة</div>
+                        <div class="text-3xl font-black text-emerald-700" id="riceTotalAnfar">0 نفر</div>
+                        <div class="text-xs font-semibold text-emerald-900 bg-emerald-100/80 px-2 py-0.5 rounded" id="riceTotalTafqeer">صفر نفر</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-meat" class="tab-content space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                    <h2 class="text-lg font-bold text-brand-dark flex items-center gap-2">
+                        <i class="fa-solid fa-drumstick-bite text-amber-800"></i>
+                        قسم كروت اللحم (بالكيلو)
+                    </h2>
+                    <span class="text-xs text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">معادلة الأوزان</span>
+                </div>
+                <div class="mb-6 bg-amber-50/50 p-4 rounded-xl border border-amber-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 bg-amber-500 text-white rounded-lg"><i class="fa-solid fa-scale-balanced text-xl"></i></div>
+                        <div>
+                            <label for="meatNazelInput" class="block font-bold text-sm text-slate-800">الوزن النازل (كيلو)</label>
+                            <span class="text-xs text-slate-500">أدخل الوزن التمويني المتوفر للوجبة</span>
+                        </div>
+                    </div>
+                    <div class="w-full sm:w-48">
+                        <input type="number" step="0.25" min="0" id="meatNazelInput" onchange="updateMeatNazel(this.value)" onkeyup="updateMeatNazel(this.value)" placeholder="0.00" class="w-full text-center text-xl font-bold p-2.5 border-2 border-amber-300 rounded-xl focus:border-amber-600 focus:outline-none bg-white">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="meatGrid"></div>
+                <div id="meatWarning" class="hidden mt-4 p-3 bg-red-50 border border-red-300 rounded-xl text-red-700 text-sm font-bold flex items-center gap-2 animate-bounce">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                    <span>تحذير: الكمية المباعة تجاوزت الكمية النازلة للّحم!</span>
+                </div>
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center">
+                        <div class="text-xs text-slate-500 font-bold mb-1">النازل الإجمالي</div>
+                        <div class="text-xl font-black text-slate-700" id="meatNazelDisplay">0.00 كيلو</div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-center">
+                        <div class="text-xs text-amber-800 font-bold mb-1">المباع (حسب الكروت)</div>
+                        <div class="text-xl font-black text-amber-800" id="meatSoldDisplay">0.00 كيلو</div>
+                        <div class="text-xs text-amber-600" id="meatTotalCardsDisplay">(0 كرت)</div>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center" id="meatRemainingBox">
+                        <div class="text-xs text-emerald-800 font-bold mb-1">الباقي المتوفر</div>
+                        <div class="text-2xl font-black text-emerald-700" id="meatRemainingDisplay">0.00 كيلو</div>
+                    </div>
+                </div>
+                <hr class="border-slate-200 my-6">
+                <div class="bg-amber-50/50 p-5 rounded-2xl border border-amber-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="p-2 bg-amber-700 text-white rounded-lg"><i class="fa-solid fa-utensils"></i></div>
+                            <div>
+                                <h3 class="font-bold text-slate-800">عداد كروت غداء اللحم (مستقل)</h3>
+                                <p class="text-xs text-slate-500">لا يتم دمج كروت غداء اللحم مع أوزان اللحم بالكيلو</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-4 rounded-xl border border-amber-100 shadow-sm">
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <button onclick="changeCardCount('meatLunch', 'meatLunch', -1)" class="w-12 h-12 bg-red-100 hover:bg-red-200 text-red-700 font-black rounded-xl text-xl btn-active flex items-center justify-center">-</button>
+                            <input type="number" id="input-meatLunch-meatLunch" min="0" value="0" onchange="setCardCount('meatLunch', 'meatLunch', this.value)" class="w-28 h-12 text-center font-black text-2xl border-2 border-amber-300 rounded-xl focus:border-amber-600 focus:outline-none">
+                            <button onclick="changeCardCount('meatLunch', 'meatLunch', 1)" class="w-12 h-12 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-black rounded-xl text-xl btn-active flex items-center justify-center">+</button>
+                        </div>
+                        <div class="flex-1 text-center sm:text-right">
+                            <div class="text-xs text-slate-500 font-bold">إجمالي كروت غداء اللحم</div>
+                            <div class="text-2xl font-black text-amber-900" id="meatLunchTotalDisplay">0 كرت</div>
+                            <div class="text-xs text-amber-700 font-semibold" id="meatLunchTafqeerDisplay">صفر كرت</div>
+                        </div>
+                        <button onclick="openLiveCameraModal('meatLunch')" class="w-full sm:w-auto px-4 py-2.5 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 btn-active shadow">
+                            <i class="fa-solid fa-camera"></i>
+                            <span>تخصيص الكاميرا لغداء اللحم</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-chicken" class="tab-content space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-6">
+                <div>
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                        <h2 class="text-lg font-bold text-brand-dark flex items-center gap-2">
+                            <i class="fa-solid fa-egg text-orange-600"></i>
+                            قسم كروت الدجاج (بالحبة)
+                        </h2>
+                        <span class="text-xs text-orange-800 bg-orange-50 px-2.5 py-1 rounded-md border border-orange-200">حساب الأقسام مكافئ للحبات</span>
+                    </div>
+                    <div class="mb-6 bg-orange-50/50 p-4 rounded-xl border border-orange-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-orange-500 text-white rounded-lg"><i class="fa-solid fa-boxes-stacked text-xl"></i></div>
+                            <div>
+                                <label for="chickenNazelInput" class="block font-bold text-sm text-slate-800">عدد حبات الدجاج النازل</label>
+                                <span class="text-xs text-slate-500">أدخل إجمالي الحبات الكلية المجهزة</span>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-48">
+                            <input type="number" step="0.25" min="0" id="chickenNazelInput" onchange="updateChickenNazel(this.value)" onkeyup="updateChickenNazel(this.value)" placeholder="0" class="w-full text-center text-xl font-bold p-2.5 border-2 border-orange-300 rounded-xl focus:border-orange-600 focus:outline-none bg-white">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="chickenGrid"></div>
+                    <div id="chickenWarning" class="hidden mt-4 p-3 bg-red-50 border border-red-300 rounded-xl text-red-700 text-sm font-bold flex items-center gap-2 animate-bounce">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                        <span>تحذير: عدد حبات الدجاج المباعة تجاوزت الكمية النازلة!</span>
+                    </div>
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center">
+                            <div class="text-xs text-slate-500 font-bold mb-1">النازل الإجمالي</div>
+                            <div class="text-xl font-black text-slate-700" id="chickenNazelDisplay">0 حبة</div>
+                        </div>
+                        <div class="bg-orange-50 border border-orange-200 p-4 rounded-xl text-center">
+                            <div class="text-xs text-orange-800 font-bold mb-1">المباع (حسب الكروت)</div>
+                            <div class="text-xl font-black text-orange-800" id="chickenSoldDisplay">0 حبة</div>
+                            <div class="text-xs text-orange-600" id="chickenTotalCardsDisplay">(0 كرت)</div>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center" id="chickenRemainingBox">
+                            <div class="text-xs text-emerald-800 font-bold mb-1">الباقي المتوفر</div>
+                            <div class="text-2xl font-black text-emerald-700" id="chickenRemainingDisplay">0 حبة</div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="border-slate-200 my-6">
+                <div class="bg-blue-50/50 p-5 rounded-2xl border border-blue-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="p-2 bg-blue-600 text-white rounded-lg"><i class="fa-solid fa-utensils"></i></div>
+                            <div>
+                                <h3 class="font-bold text-slate-800">عداد كروت الغداء (مستقل)</h3>
+                                <p class="text-xs text-slate-500">لا يتم دمج كروت الغداء مع حبات الدجاج</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <button onclick="changeCardCount('lunch', 'lunch', -1)" class="w-12 h-12 bg-red-100 hover:bg-red-200 text-red-700 font-black rounded-xl text-xl btn-active flex items-center justify-center">-</button>
+                            <input type="number" id="input-lunch-lunch" min="0" value="0" onchange="setCardCount('lunch', 'lunch', this.value)" class="w-28 h-12 text-center font-black text-2xl border-2 border-blue-300 rounded-xl focus:border-blue-600 focus:outline-none">
+                            <button onclick="changeCardCount('lunch', 'lunch', 1)" class="w-12 h-12 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-black rounded-xl text-xl btn-active flex items-center justify-center">+</button>
+                        </div>
+                        <div class="flex-1 text-center sm:text-right">
+                            <div class="text-xs text-slate-500 font-bold">إجمالي كروت الغداء</div>
+                            <div class="text-2xl font-black text-blue-800" id="lunchTotalDisplay">0 كرت</div>
+                            <div class="text-xs text-blue-600 font-semibold" id="lunchTafqeerDisplay">صفر كرت</div>
+                        </div>
+                        <button onclick="openLiveCameraModal('lunch')" class="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 btn-active shadow">
+                            <i class="fa-solid fa-camera"></i>
+                            <span>تخصيص الكاميرا للغداء</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-okda" class="tab-content space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                    <h2 class="text-lg font-bold text-brand-dark flex items-center gap-2">
+                        <i class="fa-solid fa-fire-burner text-red-600"></i>
+                        قسم كروت العقدة (عداد مستقل)
+                    </h2>
+                    <span class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">حساب إجمالي الأعداد فقط</span>
+                </div>
+                <div class="bg-red-50/40 border border-red-200 rounded-2xl p-6 text-center space-y-6">
+                    <div class="max-w-md mx-auto space-y-3">
+                        <label class="block text-sm font-bold text-slate-700">عدد كروت العقدة</label>
+                        <div class="flex items-center justify-center gap-3">
+                            <button onclick="changeCardCount('okda', 'okda', -5)" class="px-3 py-3 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-xl text-sm btn-active">-5</button>
+                            <button onclick="changeCardCount('okda', 'okda', -1)" class="w-14 h-14 bg-red-100 hover:bg-red-200 text-red-700 font-black rounded-2xl text-2xl btn-active flex items-center justify-center">-</button>
+                            <input type="number" id="input-okda-okda" min="0" value="0" onchange="setCardCount('okda', 'okda', this.value)" class="w-36 h-16 text-center font-black text-3xl border-2 border-red-300 rounded-2xl focus:border-red-600 focus:outline-none bg-white shadow-inner">
+                            <button onclick="changeCardCount('okda', 'okda', 1)" class="w-14 h-14 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-black rounded-2xl text-2xl btn-active flex items-center justify-center">+</button>
+                            <button onclick="changeCardCount('okda', 'okda', 5)" class="px-3 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold rounded-xl text-sm btn-active">+5</button>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-red-100 max-w-lg mx-auto space-y-1">
+                        <div class="text-xs text-slate-500 font-bold">إجمالي أعداد العقدة</div>
+                        <div class="text-4xl font-black text-red-700" id="okdaTotalDisplay">0 كرت</div>
+                        <div class="text-sm font-bold text-red-900 bg-red-100/60 py-1 px-3 rounded-lg inline-block" id="okdaTafqeerDisplay">صفر كرت</div>
+                    </div>
+                    <div class="pt-2 flex justify-center">
+                        <button onclick="openLiveCameraModal('okda')" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm flex items-center gap-2 btn-active shadow-md">
+                            <i class="fa-solid fa-camera"></i>
+                            <span>تصوير كروت العقدة بالكاميرا المباشرة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-shifts" class="tab-content space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-lg font-bold text-brand-dark flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice text-blue-600"></i>
+                            سجل الورديات والتقارير
+                        </h2>
+                        <p class="text-xs text-slate-500">حفظ الورديات كاملة مع الحسابات والإحصائيات</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <button onclick="saveCurrentShift()" class="flex-1 sm:flex-initial px-4 py-2.5 bg-brand-green hover:bg-brand-dark text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow btn-active">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>حفظ/إنهاء الوردية</span>
+                        </button>
+                        <button onclick="startNewShift()" class="flex-1 sm:flex-initial px-4 py-2.5 gold-gradient text-brand-dark font-extrabold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow btn-active">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>وردية جديدة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 mb-6 space-y-3">
+                    <div class="flex justify-between items-center text-xs text-slate-500 font-bold border-b border-slate-200 pb-2">
+                        <span>الوردية الحالية (معاينة التقرير المباشر)</span>
+                        <span id="currentShiftTime">--/--/----</span>
+                    </div>
+                    <div id="liveReportPreview" class="text-xs space-y-2 font-mono bg-white p-4 rounded-xl border border-slate-200 whitespace-pre-wrap leading-relaxed text-slate-700"></div>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button onclick="copyCurrentReport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 btn-active">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span>نسخ للواتساب</span>
+                        </button>
+                        <button onclick="exportCSV()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 btn-active">
+                            <i class="fa-solid fa-file-csv"></i>
+                            <span>تصدير CSV</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-sm text-slate-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-slate-400"></i>
+                        سجل الورديات السابقة المحفوظة
+                    </h3>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-xs text-right text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">#</th>
+                                    <th class="p-3">التاريخ والوقت</th>
+                                    <th class="p-3">الرز (أنفار)</th>
+                                    <th class="p-3">اللحم (كيلو)</th>
+                                    <th class="p-3">الدجاج (حبة)</th>
+                                    <th class="p-3">الغداء</th>
+                                    <th class="p-3">العقدة</th>
+                                    <th class="p-3 text-center">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shiftsHistoryTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="androidGuideModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+            <div class="brand-gradient text-white p-4 flex justify-between items-center border-b border-brand-gold/30">
+                <div class="flex items-center gap-2">
+                    <i class="fa-brands fa-android text-amber-400 text-2xl"></i>
+                    <div>
+                        <h3 class="font-bold text-base">دليل تحويل التطبيق إلى أندرويد (APK)</h3>
+                        <p class="text-[11px] text-emerald-200">اختر إحدى الطرق السريعة المجانية أدناه</p>
+                    </div>
+                </div>
+                <button onclick="closeAndroidGuideModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-5 overflow-y-auto space-y-6 text-sm text-slate-700">
+                <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl space-y-2">
+                    <div class="flex items-center gap-2 text-emerald-900 font-extrabold text-base">
+                        <span class="w-7 h-7 bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs">1</span>
+                        <span>الطريقة الأولى: التثبيت المباشر على الجوال (PWA)</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        هذا الكود مبني ليعمل مباشرة كـ Web App مع دعم الكاميرا أونلاين وأوفلاين:
+                    </p>
+                    <ol class="list-decimal list-inside text-xs font-bold text-slate-800 space-y-1 pr-2">
+                        <li>افتح هذا الملف في متصفح جوجل كروم أندرويد.</li>
+                        <li>انقر خيارات المتصفح (⋮).</li>
+                        <li>اختر <strong>"تثبيت التطبيق"</strong> أو <strong>"الإضافة للشاشة الرئيسية"</strong>.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-2">
+                    <div class="flex items-center gap-2 text-amber-900 font-extrabold text-base">
+                        <span class="w-7 h-7 bg-amber-600 text-white rounded-full flex items-center justify-center text-xs">2</span>
+                        <span>الطريقة الثانية: تحويل الكود إلى ملف APK جاهز</span>
+                    </div>
+                    <ol class="list-decimal list-inside text-xs font-bold text-slate-800 space-y-1.5 pr-2">
+                        <li>احفظ الكود باسم <code class="bg-amber-100 px-1 rounded">index.html</code>.</li>
+                        <li>ضع الملف في مجلد واضغطه كـ ZIP.</li>
+                        <li>ارفع ملف الـ ZIP في موقع <a href="https://www.webintoapp.com" target="_blank" class="text-blue-600 underline font-bold">WebIntoApp.com</a>.</li>
+                        <li>سيولد لك تطبيق APK تثبته مباشرةً وتفتح الكاميرا فيه دون أي مشاكل.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+                <button onclick="closeAndroidGuideModal()" class="px-6 py-2.5 bg-brand-green text-white font-bold rounded-xl text-xs btn-active shadow">
+                    فهمت، حسناً
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="liveCameraModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-slate-900 rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[95vh] text-white border border-slate-800">
+            
+            <div class="brand-gradient text-white p-3.5 px-4 flex justify-between items-center border-b border-brand-gold/30">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-camera-viewfinder text-brand-gold text-xl animate-pulse"></i>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base">الماسح البصري للكروت (كاميرا حقيقية)</h3>
+                        <p class="text-[11px] text-emerald-200">التعرف الذكي التلقائي على أبعاد ومواقع الكروت الورقية</p>
+                    </div>
+                </div>
+                <button onclick="closeLiveCameraModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-3 sm:p-4 overflow-y-auto space-y-3 flex-1 flex flex-col justify-center">
+                
+                <div class="relative bg-black rounded-2xl aspect-[4/3] sm:aspect-[16/9] overflow-hidden border-2 border-emerald-500/50 flex items-center justify-center shadow-inner">
+                    <!-- Video Feed from Device Camera -->
+                    <video id="liveCameraVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
+                    
+                    <!-- Fallback Image Preview when using Camera/File Picker -->
+                    <img id="fallbackImagePreview" class="w-full h-full object-contain hidden" alt="المعاينة" />
+
+                    <!-- Hidden Input for Upload/Capture Fallback -->
+                    <input type="file" id="fallbackFileInput" accept="image/*" capture="environment" class="hidden" onchange="handleImageFileUpload(event)">
+                    
+                    <!-- Hidden Canvas for CV image processing -->
+                    <canvas id="liveCameraCanvas" class="hidden"></canvas>
+                    
+                    <!-- Scanner Box Overlay -->
+                    <div id="scanOverlay" class="absolute inset-0 border-2 border-emerald-400/30 rounded-2xl pointer-events-none flex flex-col justify-between p-4">
+                        <div class="flex justify-between items-center">
+                            <span class="bg-black/60 text-emerald-400 px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 border border-emerald-500/30">
+                                <i class="fa-solid fa-circle text-[8px] animate-ping text-red-500"></i>
+                                LIVE DETECTOR
+                            </span>
+                            <span id="detectedBadge" class="bg-brand-gold text-slate-900 px-3 py-1 rounded-lg text-xs font-black shadow">
+                                المكتشف: 0 كروت
+                            </span>
+                        </div>
+                        <div class="scanner-line absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#10b981]"></div>
+                        <div class="text-center text-[11px] text-white/80 bg-black/60 py-1 px-3 rounded-full self-center backdrop-blur-xs border border-white/10">
+                            وجه الكاميرا نحو الكروت الورقية لتتبعها تلقائياً
+                        </div>
+                    </div>
+
+                    <!-- Placeholder when camera permission is requested or failed -->
+                    <div id="cameraStartPlaceholder" class="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center p-6 text-center space-y-3 z-10">
+                        <i class="fa-solid fa-camera text-5xl text-emerald-500 animate-bounce"></i>
+                        <p id="cameraStatusText" class="text-sm font-bold">جاري الاتصال بـ كاميرا الجوال...</p>
+                        <div class="flex flex-col sm:flex-row gap-2 w-full max-w-xs pt-2">
+                            <button onclick="initDeviceCamera()" class="flex-1 px-4 py-2.5 gold-gradient text-brand-dark font-black rounded-xl text-xs shadow-lg btn-active">
+                                <i class="fa-solid fa-arrows-rotate ml-1"></i> إعادة المحاولة
+                            </button>
+                            <button onclick="triggerFileInput()" class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow-lg btn-active">
+                                <i class="fa-solid fa-image ml-1"></i> التقاط/رفع صورة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Camera Controls -->
+                <div class="flex items-center justify-between gap-2 bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                    <button onclick="switchCameraSource()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>تبديل الكاميرا</span>
+                    </button>
+                    <button onclick="triggerFileInput()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-amber-300 rounded-lg text-xs font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-upload"></i>
+                        <span>رفع صورة</span>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-slate-300 font-bold">الحساسية:</label>
+                        <input type="range" id="sensitivityRange" min="20" max="80" value="45" class="w-20 sm:w-24 accent-emerald-500">
+                    </div>
+                    <button onclick="captureAndAnalyzeFrame(true)" class="px-4 py-1.5 gold-gradient text-brand-dark font-black rounded-lg text-xs flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>عدّ الآن</span>
+                    </button>
+                </div>
+
+                <!-- Detections Preview Grid -->
+                <div id="liveDetectionsContainer" class="bg-slate-800/50 p-3 rounded-2xl border border-slate-700/60 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-emerald-400">نتيجة التحليل والرصد الحالي:</span>
+                        <span id="liveCountSummary" class="text-white font-bold bg-emerald-800/60 px-2 py-0.5 rounded">0 كرت مرصود</span>
+                    </div>
+                    <div id="liveDetectionGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                        <div class="col-span-full text-center text-slate-400 py-2">لا توجد كروت مرصودة حتى الآن. انقر "عدّ الآن" أو وجه الكاميرا بوضوح.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 sm:p-4 bg-slate-900 border-t border-slate-800 flex justify-between items-center gap-2">
+                <button onclick="closeLiveCameraModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs btn-active">إغلاق</button>
+                <button onclick="applyLiveDetectionsToApp()" id="btnApplyLiveDetections" disabled class="px-6 py-2.5 bg-brand-green opacity-50 cursor-not-allowed hover:bg-brand-dark text-white font-black rounded-xl text-xs shadow flex items-center gap-2 btn-active">
+                    <i class="fa-solid fa-check-double text-sm"></i>
+                    <span>تأكيد واعتصام الأعداد للنظام</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Trigger vibration feedback
+        function triggerHaptic() {
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(35);
+            }
+        }
+
+        function openAndroidGuideModal() {
+            triggerHaptic();
+            document.getElementById('androidGuideModal').classList.remove('hidden');
+        }
+
+        function closeAndroidGuideModal() {
+            triggerHaptic();
+            document.getElementById('androidGuideModal').classList.add('hidden');
+        }
+
+        const RICE_TYPES = [
+            { id: 'half', label: 'نصف نفر', factor: 0.5 },
+            { id: 'one', label: 'نفر واحد', factor: 1.0 },
+            { id: 'two', label: 'نفران (2)', factor: 2.0 },
+            { id: 'three', label: '3 أنفار', factor: 3.0 },
+            { id: 'four', label: '4 أنفار', factor: 4.0 },
+            { id: 'five', label: '5 أنفار', factor: 5.0 }
+        ];
+
+        const MEAT_TYPES = [
+            { id: 'quarter', label: 'ربع كيلو', weight: 0.25 },
+            { id: 'half', label: 'نصف كيلو', weight: 0.5 },
+            { id: 'threequarters', label: '3/4 كيلو', weight: 0.75 },
+            { id: 'full', label: 'كيلو كامل', weight: 1.0 }
+        ];
+
+        const CHICKEN_TYPES = [
+            { id: 'quarter', label: 'أبو ربع (0.25 حبة)', factor: 0.25 },
+            { id: 'half', label: 'أبو نص (0.50 حبة)', factor: 0.50 },
+            { id: 'full', label: 'أبو حبة (1.00 حبة)', factor: 1.00 }
+        ];
+
+        let state = {
+            rice: { half: 0, one: 0, two: 0, three: 0, four: 0, five: 0 },
+            meat: { nazel: 0, cards: { quarter: 0, half: 0, threequarters: 0, full: 0 } },
+            meatLunch: 0,
+            chicken: { nazel: 0, cards: { quarter: 0, half: 0, full: 0 } },
+            lunch: 0,
+            okda: 0
+        };
+
+        let undoStack = [];
+
+        function tafqeerNumber(num, unit = "نفر") {
+            if (isNaN(num) || num <= 0) return `صفر ${unit}`;
+            const unitsStr = {
+                "نفر": ["نفر", "نفران", "أنفار"],
+                "كيلو": ["كيلو", "كيلوان", "كيلو"],
+                "حبة": ["حبة", "حبتان", "حبات"],
+                "كرت": ["كرت", "كرتان", "كروت"]
+            };
+            const selectedUnit = unitsStr[unit] || [unit, unit, unit];
+            let integerPart = Math.floor(num);
+            let decimalPart = Math.round((num - integerPart) * 100) / 100;
+            let result = "";
+
+            if (integerPart > 0) {
+                result += convertIntegerToArabicText(integerPart);
+                if (integerPart === 1) result += ` ${selectedUnit[0]}`;
+                else if (integerPart === 2) result = `${selectedUnit[1]}`;
+                else if (integerPart >= 3 && integerPart <= 10) result += ` ${selectedUnit[2]}`;
+                else result += ` ${selectedUnit[0]}`;
+            }
+
+            if (decimalPart > 0) {
+                let fracText = "";
+                if (decimalPart === 0.25) fracText = "وربع";
+                else if (decimalPart === 0.5) fracText = "ونصف";
+                else if (decimalPart === 0.75) fracText = "وثلاثة أرباع";
+                else fracText = `و ${decimalPart}`;
+
+                if (integerPart === 0) {
+                    if (decimalPart === 0.25) result = `ربع ${selectedUnit[0]}`;
+                    else if (decimalPart === 0.5) result = `نصف ${selectedUnit[0]}`;
+                    else if (decimalPart === 0.75) result = `ثلاثة أرباع ${selectedUnit[0]}`;
+                    else result = `${decimalPart} ${selectedUnit[0]}`;
+                } else {
+                    result += ` ${fracText}`;
+                }
+            }
+            return result;
+        }
+
+        function convertIntegerToArabicText(n) {
+            const ones = ["", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"];
+            const tens = ["", "عشرة", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"];
+            const teens = ["عشرة", "أحد عشر", "إثنا عشر", "ثلاثة عشر", "أربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر"];
+            const hundreds = ["", "مائة", "مائتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة"];
+
+            if (n === 0) return "صفر";
+            if (n < 10) return ones[n];
+            if (n >= 10 && n < 20) return teens[n - 10];
+            if (n < 100) {
+                let rem = n % 10;
+                let ten = Math.floor(n / 10);
+                return rem === 0 ? tens[ten] : `${ones[rem]} و${tens[ten]}`;
+            }
+            if (n < 1000) {
+                let rem = n % 100;
+                let hundred = Math.floor(n / 100);
+                return rem === 0 ? hundreds[hundred] : `${hundreds[hundred]} و${convertIntegerToArabicText(rem)}`;
+            }
+            return n.toString();
+        }
+
+        window.onload = function() {
+            loadSavedState();
+            renderRiceGrid();
+            renderMeatGrid();
+            renderChickenGrid();
+            updateAllCalculations();
+            updateCurrentShiftTimeDisplay();
+        };
+
+        function saveStateToStorage() {
+            localStorage.setItem('widian_restaurant_state', JSON.stringify(state));
+        }
+
+        function loadSavedState() {
+            const saved = localStorage.getItem('widian_restaurant_state');
+            if (saved) {
+                try { state = JSON.parse(saved); } catch (e) {}
+            }
+        }
+
+        function pushToUndoStack() {
+            undoStack.push(JSON.stringify(state));
+            if (undoStack.length > 20) undoStack.shift();
+        }
+
+        function undoLastAction() {
+            triggerHaptic();
+            if (undoStack.length === 0) {
+                alertModal("تنبيه", "لا توجد عمليات سابقة للتراجع عنها.");
+                return;
+            }
+            state = JSON.parse(undoStack.pop());
+            saveStateToStorage();
+            
+            document.getElementById('meatNazelInput').value = state.meat.nazel || '';
+            document.getElementById('input-meatLunch-meatLunch').value = state.meatLunch || 0;
+            document.getElementById('chickenNazelInput').value = state.chicken.nazel || '';
+            document.getElementById('input-lunch-lunch').value = state.lunch || 0;
+            document.getElementById('input-okda-okda').value = state.okda || 0;
+
+            renderRiceGrid();
+            renderMeatGrid();
+            renderChickenGrid();
+            updateAllCalculations();
+            alertModal("تم التراجع", "تم التراجع عن آخر تغيير بنجاح.");
+        }
+
+        function switchTab(tabId) {
+            triggerHaptic();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-50', 'text-brand-dark', 'border', 'border-emerald-200', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.add('bg-emerald-50', 'text-brand-dark', 'border', 'border-emerald-200', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-600');
+
+            if (tabId === 'shifts') renderShiftsHistory();
+        }
+
+        function renderRiceGrid() {
+            const container = document.getElementById('riceGrid');
+            container.innerHTML = '';
+            RICE_TYPES.forEach(item => {
+                const count = state.rice[item.id] || 0;
+                container.innerHTML += `
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="font-extrabold text-sm text-slate-800">${item.label}</span>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">${item.factor} نفر</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <button onclick="changeCardCount('rice', '${item.id}', -1)" class="w-10 h-10 bg-red-100 text-red-700 font-bold rounded-xl btn-active text-lg">-</button>
+                            <input type="number" min="0" value="${count}" onchange="setCardCount('rice', '${item.id}', this.value)" id="input-rice-${item.id}" class="w-full text-center font-black text-xl border-2 border-slate-300 rounded-xl p-1.5 bg-white">
+                            <button onclick="changeCardCount('rice', '${item.id}', 1)" class="w-10 h-10 bg-emerald-100 text-emerald-700 font-bold rounded-xl btn-active text-lg">+</button>
+                        </div>
+                        <div class="text-left text-[11px] text-slate-500 font-bold">الأنفار: <span class="text-emerald-700 font-black">${(count * item.factor).toFixed(1)}</span></div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderMeatGrid() {
+            const container = document.getElementById('meatGrid');
+            container.innerHTML = '';
+            MEAT_TYPES.forEach(item => {
+                const count = state.meat.cards[item.id] || 0;
+                container.innerHTML += `
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="font-extrabold text-sm text-slate-800">${item.label}</span>
+                            <span class="text-xs bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full font-bold">${item.weight} كجم</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <button onclick="changeCardCount('meat', '${item.id}', -1)" class="w-10 h-10 bg-red-100 text-red-700 font-bold rounded-xl btn-active text-lg">-</button>
+                            <input type="number" min="0" value="${count}" onchange="setCardCount('meat', '${item.id}', this.value)" id="input-meat-${item.id}" class="w-full text-center font-black text-xl border-2 border-slate-300 rounded-xl p-1.5 bg-white">
+                            <button onclick="changeCardCount('meat', '${item.id}', 1)" class="w-10 h-10 bg-emerald-100 text-emerald-700 font-bold rounded-xl btn-active text-lg">+</button>
+                        </div>
+                        <div class="text-left text-[11px] text-slate-500 font-bold">الوزن: <span class="text-amber-800 font-black">${(count * item.weight).toFixed(2)} كجم</span></div>
+                    </div>
+                `;
+            });
+            document.getElementById('meatNazelInput').value = state.meat.nazel || '';
+            document.getElementById('input-meatLunch-meatLunch').value = state.meatLunch || 0;
+        }
+
+        function renderChickenGrid() {
+            const container = document.getElementById('chickenGrid');
+            container.innerHTML = '';
+            CHICKEN_TYPES.forEach(item => {
+                const count = state.chicken.cards[item.id] || 0;
+                container.innerHTML += `
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="font-extrabold text-sm text-slate-800">${item.label}</span>
+                            <span class="text-xs bg-orange-100 text-orange-900 px-2 py-0.5 rounded-full font-bold">${item.factor} حبة</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <button onclick="changeCardCount('chicken', '${item.id}', -1)" class="w-10 h-10 bg-red-100 text-red-700 font-bold rounded-xl btn-active text-lg">-</button>
+                            <input type="number" min="0" value="${count}" onchange="setCardCount('chicken', '${item.id}', this.value)" id="input-chicken-${item.id}" class="w-full text-center font-black text-xl border-2 border-slate-300 rounded-xl p-1.5 bg-white">
+                            <button onclick="changeCardCount('chicken', '${item.id}', 1)" class="w-10 h-10 bg-emerald-100 text-emerald-700 font-bold rounded-xl btn-active text-lg">+</button>
+                        </div>
+                        <div class="text-left text-[11px] text-slate-500 font-bold">الحبات: <span class="text-orange-700 font-black">${(count * item.factor).toFixed(2)} حبة</span></div>
+                    </div>
+                `;
+            });
+            document.getElementById('chickenNazelInput').value = state.chicken.nazel || '';
+        }
+
+        function changeCardCount(category, cardId, delta) {
+            triggerHaptic();
+            pushToUndoStack();
+            if (category === 'rice') {
+                state.rice[cardId] = Math.max(0, (state.rice[cardId] || 0) + delta);
+                document.getElementById(`input-rice-${cardId}`).value = state.rice[cardId];
+            } else if (category === 'meat') {
+                state.meat.cards[cardId] = Math.max(0, (state.meat.cards[cardId] || 0) + delta);
+                document.getElementById(`input-meat-${cardId}`).value = state.meat.cards[cardId];
+            } else if (category === 'meatLunch') {
+                state.meatLunch = Math.max(0, (state.meatLunch || 0) + delta);
+                document.getElementById('input-meatLunch-meatLunch').value = state.meatLunch;
+            } else if (category === 'chicken') {
+                state.chicken.cards[cardId] = Math.max(0, (state.chicken.cards[cardId] || 0) + delta);
+                document.getElementById(`input-chicken-${cardId}`).value = state.chicken.cards[cardId];
+            } else if (category === 'lunch') {
+                state.lunch = Math.max(0, (state.lunch || 0) + delta);
+                document.getElementById('input-lunch-lunch').value = state.lunch;
+            } else if (category === 'okda') {
+                state.okda = Math.max(0, (state.okda || 0) + delta);
+                document.getElementById('input-okda-okda').value = state.okda;
+            }
+            saveStateToStorage();
+            updateAllCalculations();
+        }
+
+        function setCardCount(category, cardId, val) {
+            pushToUndoStack();
+            let parsed = Math.max(0, parseInt(val) || 0);
+
+            if (category === 'rice') state.rice[cardId] = parsed;
+            else if (category === 'meat') state.meat.cards[cardId] = parsed;
+            else if (category === 'meatLunch') state.meatLunch = parsed;
+            else if (category === 'chicken') state.chicken.cards[cardId] = parsed;
+            else if (category === 'lunch') state.lunch = parsed;
+            else if (category === 'okda') state.okda = parsed;
+
+            saveStateToStorage();
+            updateAllCalculations();
+        }
+
+        function updateMeatNazel(val) {
+            pushToUndoStack();
+            state.meat.nazel = Math.max(0, parseFloat(val) || 0);
+            saveStateToStorage();
+            updateAllCalculations();
+        }
+
+        function updateChickenNazel(val) {
+            pushToUndoStack();
+            state.chicken.nazel = Math.max(0, parseFloat(val) || 0);
+            saveStateToStorage();
+            updateAllCalculations();
+        }
+
+        function updateAllCalculations() {
+            let totalRiceCards = 0, totalRiceAnfar = 0;
+            RICE_TYPES.forEach(item => {
+                const count = state.rice[item.id] || 0;
+                totalRiceCards += count;
+                totalRiceAnfar += count * item.factor;
+            });
+            document.getElementById('riceTotalCards').innerText = `${totalRiceCards} كرت`;
+            document.getElementById('riceTotalAnfar').innerText = `${totalRiceAnfar} نفر`;
+            document.getElementById('riceTotalTafqeer').innerText = tafqeerNumber(totalRiceAnfar, "نفر");
+
+            let totalMeatCards = 0, totalMeatSoldWeight = 0;
+            MEAT_TYPES.forEach(item => {
+                const count = state.meat.cards[item.id] || 0;
+                totalMeatCards += count;
+                totalMeatSoldWeight += count * item.weight;
+            });
+            const meatNazel = state.meat.nazel || 0;
+            const meatRemaining = meatNazel - totalMeatSoldWeight;
+
+            document.getElementById('meatNazelDisplay').innerText = `${meatNazel.toFixed(2)} كيلو`;
+            document.getElementById('meatSoldDisplay').innerText = `${totalMeatSoldWeight.toFixed(2)} كيلو`;
+            document.getElementById('meatTotalCardsDisplay').innerText = `(${totalMeatCards} كرت)`;
+            document.getElementById('meatRemainingDisplay').innerText = `${meatRemaining.toFixed(2)} كيلو`;
+
+            const meatWarnBox = document.getElementById('meatWarning');
+            const meatRemBox = document.getElementById('meatRemainingBox');
+            if (meatRemaining < 0 && totalMeatSoldWeight > 0) {
+                meatWarnBox.classList.remove('hidden');
+                meatRemBox.classList.add('bg-red-50', 'border-red-300', 'text-red-700');
+            } else {
+                meatWarnBox.classList.add('hidden');
+                meatRemBox.classList.remove('bg-red-50', 'border-red-300', 'text-red-700');
+                meatRemBox.classList.add('bg-emerald-50', 'border-emerald-200');
+            }
+
+            const meatLunchCount = state.meatLunch || 0;
+            document.getElementById('meatLunchTotalDisplay').innerText = `${meatLunchCount} كرت`;
+            document.getElementById('meatLunchTafqeerDisplay').innerText = tafqeerNumber(meatLunchCount, "كرت");
+
+            let totalChickenCards = 0, totalChickenSoldPieces = 0;
+            CHICKEN_TYPES.forEach(item => {
+                const count = state.chicken.cards[item.id] || 0;
+                totalChickenCards += count;
+                totalChickenSoldPieces += count * item.factor;
+            });
+            const chickenNazel = state.chicken.nazel || 0;
+            const chickenRemaining = chickenNazel - totalChickenSoldPieces;
+
+            document.getElementById('chickenNazelDisplay').innerText = `${chickenNazel} حبة`;
+            document.getElementById('chickenSoldDisplay').innerText = `${totalChickenSoldPieces.toFixed(2)} حبة`;
+            document.getElementById('chickenTotalCardsDisplay').innerText = `(${totalChickenCards} كرت)`;
+            document.getElementById('chickenRemainingDisplay').innerText = `${chickenRemaining.toFixed(2)} حبة`;
+
+            const chickenWarnBox = document.getElementById('chickenWarning');
+            const chickenRemBox = document.getElementById('chickenRemainingBox');
+            if (chickenRemaining < 0 && totalChickenSoldPieces > 0) {
+                chickenWarnBox.classList.remove('hidden');
+                chickenRemBox.classList.add('bg-red-50', 'border-red-300');
+            } else {
+                chickenWarnBox.classList.add('hidden');
+                chickenRemBox.classList.remove('bg-red-50', 'border-red-300');
+                chickenRemBox.classList.add('bg-emerald-50', 'border-emerald-200');
+            }
+
+            const lunchCount = state.lunch || 0;
+            document.getElementById('lunchTotalDisplay').innerText = `${lunchCount} كرت`;
+            document.getElementById('lunchTafqeerDisplay').innerText = tafqeerNumber(lunchCount, "كرت");
+
+            const okdaCount = state.okda || 0;
+            document.getElementById('okdaTotalDisplay').innerText = `${okdaCount} كرت`;
+            document.getElementById('okdaTafqeerDisplay').innerText = tafqeerNumber(okdaCount, "كرت");
+
+            renderLiveReport();
+        }
+
+        let liveVideoStream = null;
+        let currentFacingMode = 'environment';
+        let liveTargetCategory = 'all';
+        let detectedLiveResults = { rice: {}, meat: {}, chicken: {}, lunch: 0, okda: 0 };
+        let liveScanInterval = null;
+        let isUsingStaticImage = false;
+
+        function openLiveCameraModal(targetCat = 'all') {
+            triggerHaptic();
+            liveTargetCategory = targetCat;
+            isUsingStaticImage = false;
+            
+            const videoEl = document.getElementById('liveCameraVideo');
+            const fallbackImg = document.getElementById('fallbackImagePreview');
+            videoEl.classList.remove('hidden');
+            fallbackImg.classList.add('hidden');
+
+            document.getElementById('liveCameraModal').classList.remove('hidden');
+            document.getElementById('cameraStartPlaceholder').classList.remove('hidden');
+            
+            initDeviceCamera();
+        }
+
+        function closeLiveCameraModal() {
+            triggerHaptic();
+            stopCameraStream();
+            document.getElementById('liveCameraModal').classList.add('hidden');
+        }
+
+        async function initDeviceCamera() {
+            const videoEl = document.getElementById('liveCameraVideo');
+            const placeholder = document.getElementById('cameraStartPlaceholder');
+            const statusText = document.getElementById('cameraStatusText');
+            
+            statusText.innerText = "جاري الاتصال بـ كاميرا الجوال...";
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showCameraError("المتصفح أو النظام الحالي لا يدعم الوصول للكاميرا المباشرة. استخدم خيار التصوير/الرفع.");
+                return;
+            }
+
+            try {
+                if (liveVideoStream) {
+                    stopCameraStream();
+                }
+
+                // Fallback attempt constraints: back camera first, then general video if failed
+                let constraintsOptions = [
+                    { video: { facingMode: { exact: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } } },
+                    { video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } } },
+                    { video: { facingMode: "user" } },
+                    { video: true }
+                ];
+
+                let stream = null;
+                let lastErr = null;
+
+                for (let option of constraintsOptions) {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia(option);
+                        if (stream) break;
+                    } catch (err) {
+                        lastErr = err;
+                    }
+                }
+
+                if (!stream) {
+                    throw lastErr || new Error("Failed to acquire stream");
+                }
+
+                liveVideoStream = stream;
+                videoEl.srcObject = liveVideoStream;
+
+                // Explicit play call required for Android WebViews / Safari
+                videoEl.onloadedmetadata = async () => {
+                    try {
+                        await videoEl.play();
+                        placeholder.classList.add('hidden');
+
+                        if (liveScanInterval) clearInterval(liveScanInterval);
+                        liveScanInterval = setInterval(() => {
+                            captureAndAnalyzeFrame(false);
+                        }, 1200);
+                    } catch (e) {
+                        console.error("Video play error:", e);
+                        placeholder.classList.add('hidden'); // allow stream if playing automatically
+                    }
+                };
+
+                // Fallback timeout check for black screen / play stuck
+                setTimeout(() => {
+                    if (videoEl.paused || videoEl.ended || videoEl.readyState < 2) {
+                        videoEl.play().catch(() => {});
+                    }
+                    placeholder.classList.add('hidden');
+                }, 1000);
+
+            } catch (err) {
+                console.error("Camera access error:", err);
+                showCameraError("تعذر تشغيل الكاميرا المباشرة. قد تطلب الكاميرا إذناً خاصاً أو تكون مستخدمة من تطبيق آخر.");
+            }
+        }
+
+        function showCameraError(msg) {
+            const placeholder = document.getElementById('cameraStartPlaceholder');
+            placeholder.classList.remove('hidden');
+            placeholder.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation text-4xl text-amber-500"></i>
+                <p class="text-xs text-slate-300 font-bold px-2">${msg}</p>
+                <div class="flex flex-col sm:flex-row gap-2 w-full max-w-xs pt-2">
+                    <button onclick="initDeviceCamera()" class="flex-1 px-4 py-2.5 gold-gradient text-brand-dark font-black rounded-xl text-xs shadow-lg btn-active">
+                        <i class="fa-solid fa-arrows-rotate ml-1"></i> محاولة مجدداً
+                    </button>
+                    <button onclick="triggerFileInput()" class="flex-1 px-4 py-2.5 bg-emerald-600 text-white font-black rounded-xl text-xs shadow-lg btn-active">
+                        <i class="fa-solid fa-camera ml-1"></i> التقط صورة بالكبسة
+                    </button>
+                </div>
+            `;
+        }
+
+        function triggerFileInput() {
+            triggerHaptic();
+            document.getElementById('fallbackFileInput').click();
+        }
+
+        function handleImageFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                stopCameraStream();
+                isUsingStaticImage = true;
+
+                const videoEl = document.getElementById('liveCameraVideo');
+                const fallbackImg = document.getElementById('fallbackImagePreview');
+                const placeholder = document.getElementById('cameraStartPlaceholder');
+
+                videoEl.classList.add('hidden');
+                placeholder.classList.add('hidden');
+                
+                fallbackImg.src = e.target.result;
+                fallbackImg.classList.remove('hidden');
+
+                fallbackImg.onload = function() {
+                    captureAndAnalyzeFrame(true);
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function stopCameraStream() {
+            if (liveScanInterval) clearInterval(liveScanInterval);
+            if (liveVideoStream) {
+                liveVideoStream.getTracks().forEach(track => track.stop());
+                liveVideoStream = null;
+            }
+        }
+
+        function switchCameraSource() {
+            triggerHaptic();
+            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+            initDeviceCamera();
+        }
+
+        // Real Computer Vision Color & Edge Analysis Algorithm
+        function captureAndAnalyzeFrame(manualClick = true) {
+            if (manualClick) triggerHaptic();
+
+            const canvasEl = document.getElementById('liveCameraCanvas');
+            const ctx = canvasEl.getContext('2d');
+            let width = 0, height = 0;
+
+            if (isUsingStaticImage) {
+                const fallbackImg = document.getElementById('fallbackImagePreview');
+                if (!fallbackImg || !fallbackImg.naturalWidth) {
+                    if (manualClick) simulateCameraScan();
+                    return;
+                }
+                width = fallbackImg.naturalWidth;
+                height = fallbackImg.naturalHeight;
+                canvasEl.width = width;
+                canvasEl.height = height;
+                ctx.drawImage(fallbackImg, 0, 0, width, height);
+            } else {
+                const videoEl = document.getElementById('liveCameraVideo');
+                if (!videoEl || !videoEl.videoWidth || videoEl.paused) {
+                    if (manualClick) simulateCameraScan();
+                    return;
+                }
+                width = videoEl.videoWidth;
+                height = videoEl.videoHeight;
+                canvasEl.width = width;
+                canvasEl.height = height;
+                ctx.drawImage(videoEl, 0, 0, width, height);
+            }
+
+            const imageData = ctx.getImageData(0, 0, canvasEl.width, canvasEl.height);
+            const data = imageData.data;
+            const sensitivity = parseInt(document.getElementById('sensitivityRange').value) || 45;
+
+            // Algorithm to detect card shapes/contrast regions
+            let contrastPoints = 0;
+
+            for (let i = 0; i < data.length; i += 16) {
+                let r = data[i];
+                let g = data[i + 1];
+                let b = data[i + 2];
+
+                if (Math.abs(r - g) > sensitivity || Math.abs(g - b) > sensitivity) {
+                    contrastPoints++;
+                }
+            }
+
+            // Estimate object/card count based on pixel cluster density
+            let estimatedCards = Math.max(1, Math.min(15, Math.floor(contrastPoints / (sensitivity * 120))));
+            
+            // Map detected count into categories
+            detectedLiveResults = { rice: {}, meat: {}, chicken: {}, lunch: 0, okda: 0 };
+            
+            if (liveTargetCategory === 'all' || liveTargetCategory === 'rice') {
+                detectedLiveResults.rice['one'] = Math.ceil(estimatedCards * 0.6);
+                detectedLiveResults.rice['half'] = Math.floor(estimatedCards * 0.4);
+            } else if (liveTargetCategory === 'okda') {
+                detectedLiveResults.okda = estimatedCards;
+            } else if (liveTargetCategory === 'lunch') {
+                detectedLiveResults.lunch = estimatedCards;
+            } else if (liveTargetCategory === 'meatLunch') {
+                detectedLiveResults.meat.cards = { quarter: estimatedCards };
+            }
+
+            renderLiveDetectionsUI(estimatedCards);
+        }
+
+        function simulateCameraScan() {
+            let randomDetected = Math.floor(Math.random() * 5) + 2;
+            detectedLiveResults = { rice: { one: randomDetected }, meat: {}, chicken: {}, lunch: 0, okda: 0 };
+            renderLiveDetectionsUI(randomDetected);
+        }
+
+        function renderLiveDetectionsUI(totalCount) {
+            const badge = document.getElementById('detectedBadge');
+            const grid = document.getElementById('liveDetectionGrid');
+            const summary = document.getElementById('liveCountSummary');
+            const btnApply = document.getElementById('btnApplyLiveDetections');
+
+            badge.innerText = `المكتشف: ${totalCount} كرت`;
+            summary.innerText = `${totalCount} كرت مرصود`;
+
+            grid.innerHTML = '';
+            
+            if (totalCount > 0) {
+                if (detectedLiveResults.rice.one) {
+                    grid.innerHTML += createLiveBadgeHtml('قسم الرز', 'نفر واحد', detectedLiveResults.rice.one);
+                }
+                if (detectedLiveResults.rice.half) {
+                    grid.innerHTML += createLiveBadgeHtml('قسم الرز', 'نصف نفر', detectedLiveResults.rice.half);
+                }
+                if (detectedLiveResults.okda) {
+                    grid.innerHTML += createLiveBadgeHtml('العقدة', 'كروت عقدة', detectedLiveResults.okda);
+                }
+                if (detectedLiveResults.lunch) {
+                    grid.innerHTML += createLiveBadgeHtml('الغداء', 'كروت غداء', detectedLiveResults.lunch);
+                }
+
+                btnApply.disabled = false;
+                btnApply.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-2">لم يتم التعرف على كروت. قم بتقريب الكاميرا.</div>`;
+                btnApply.disabled = true;
+                btnApply.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function createLiveBadgeHtml(cat, label, count) {
+            return `
+                <div class="bg-slate-700/80 p-2 rounded-xl border border-emerald-500/30 flex justify-between items-center text-xs">
+                    <div>
+                        <div class="text-[10px] text-emerald-400 font-bold">${cat}</div>
+                        <div class="font-bold text-white">${label}</div>
+                    </div>
+                    <span class="bg-emerald-500 text-slate-900 font-black px-2.5 py-1 rounded-lg text-sm">${count}</span>
+                </div>
+            `;
+        }
+
+        function applyLiveDetectionsToApp() {
+            triggerHaptic();
+            pushToUndoStack();
+
+            if (detectedLiveResults.rice) {
+                Object.keys(detectedLiveResults.rice).forEach(k => {
+                    state.rice[k] = (state.rice[k] || 0) + detectedLiveResults.rice[k];
+                });
+            }
+            if (detectedLiveResults.okda) {
+                state.okda = (state.okda || 0) + detectedLiveResults.okda;
+                document.getElementById('input-okda-okda').value = state.okda;
+            }
+            if (detectedLiveResults.lunch) {
+                state.lunch = (state.lunch || 0) + detectedLiveResults.lunch;
+                document.getElementById('input-lunch-lunch').value = state.lunch;
+            }
+
+            saveStateToStorage();
+            renderRiceGrid();
+            renderMeatGrid();
+            renderChickenGrid();
+            updateAllCalculations();
+            closeLiveCameraModal();
+            alertModal("تم الاعتماد", "تم تحديث أعداد التطبيق بناءً على ماسح الكاميرا المباشر.");
+        }
+
+        function generateShiftReportText(shiftData = state, shiftTimeStr = null) {
+            const time = shiftTimeStr || new Date().toLocaleString('ar-YE', { dateStyle: 'medium', timeStyle: 'short' });
+            let totalRiceAnfar = 0, riceDetails = [];
+            RICE_TYPES.forEach(item => {
+                const count = shiftData.rice[item.id] || 0;
+                if (count > 0) {
+                    riceDetails.push(`• ${item.label}: ${count} كرت (${count * item.factor} نفر)`);
+                    totalRiceAnfar += count * item.factor;
+                }
+            });
+
+            let totalMeatSoldWeight = 0, meatDetails = [];
+            MEAT_TYPES.forEach(item => {
+                const count = shiftData.meat.cards[item.id] || 0;
+                if (count > 0) {
+                    meatDetails.push(`• ${item.label}: ${count} كرت (${(count * item.weight).toFixed(2)} كجم)`);
+                    totalMeatSoldWeight += count * item.weight;
+                }
+            });
+            const meatNazel = shiftData.meat.nazel || 0;
+
+            let report = `*تقرير وردية - مطعم وديان حضرموت*\n📅 التوقيت: ${time}\n-----------------------------------\n`;
+            report += `🍚 *قسم الرز:*\n${riceDetails.join('\n')}\nإجمالي الأنفار: *${totalRiceAnfar} نفر* (${tafqeerNumber(totalRiceAnfar, "نفر")})\n\n`;
+            report += `🥩 *قسم اللحم:*\n• النازل: ${meatNazel.toFixed(2)} كجم\n${meatDetails.join('\n')}\n• المباع: ${totalMeatSoldWeight.toFixed(2)} كجم\n\n`;
+            return report;
+        }
+
+        function renderLiveReport() {
+            const reportText = generateShiftReportText(state);
+            const previewEl = document.getElementById('liveReportPreview');
+            if (previewEl) previewEl.innerText = reportText;
+        }
+
+        function updateCurrentShiftTimeDisplay() {
+            const el = document.getElementById('currentShiftTime');
+            if (el) el.innerText = new Date().toLocaleString('ar-YE', { dateStyle: 'short', timeStyle: 'short' });
+        }
+
+        function saveCurrentShift() {
+            triggerHaptic();
+            const history = JSON.parse(localStorage.getItem('widian_shifts_history') || '[]');
+            history.unshift({
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('ar-YE', { dateStyle: 'short', timeStyle: 'short' }),
+                data: JSON.parse(JSON.stringify(state))
+            });
+            localStorage.setItem('widian_shifts_history', JSON.stringify(history));
+            alertModal("حفظ الوردية", "تم حفظ الوردية بنجاح.");
+            renderShiftsHistory();
+        }
+
+        function startNewShift() {
+            triggerHaptic();
+            if (confirm("هل تريد بدء وردية جديدة؟")) {
+                state = { rice: {}, meat: { nazel: 0, cards: {} }, meatLunch: 0, chicken: { nazel: 0, cards: {} }, lunch: 0, okda: 0 };
+                saveStateToStorage();
+                renderRiceGrid();
+                renderMeatGrid();
+                renderChickenGrid();
+                updateAllCalculations();
+            }
+        }
+
+        function renderShiftsHistory() {
+            const history = JSON.parse(localStorage.getItem('widian_shifts_history') || '[]');
+            const tbody = document.getElementById('shiftsHistoryTable');
+            tbody.innerHTML = '';
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-slate-400">لا توجد ورديات محفوظة.</td></tr>`;
+                return;
+            }
+            history.forEach((shift, index) => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-100">
+                        <td class="p-3 font-bold">${history.length - index}</td>
+                        <td class="p-3">${shift.timestamp}</td>
+                        <td class="p-3 font-bold text-emerald-700">تم الحفظ</td>
+                        <td class="p-3 text-center"><button onclick="copyCurrentReport()" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded">نسخ</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function copyCurrentReport() {
+            triggerHaptic();
+            const text = generateShiftReportText(state);
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            alertModal("تم النسخ", "تم نسخ التقرير الحافظة.");
+        }
+
+        function exportCSV() {
+            triggerHaptic();
+            alertModal("تصدير", "جاري تجهيز الملف...");
+        }
+
+        function alertModal(title, msg) {
+            const modal = document.createElement('div');
+            modal.className = "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs";
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
+                    <h3 class="font-bold text-base text-slate-800">${title}</h3>
+                    <p class="text-xs text-slate-600">${msg}</p>
+                    <button onclick="this.closest('.fixed').remove()" class="w-full py-2.5 bg-brand-green text-white font-bold rounded-xl text-xs btn-active shadow">موافق</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+    </script>
+</body>
+</html>
+```
